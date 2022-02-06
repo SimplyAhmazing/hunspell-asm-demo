@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Hunspell-asm browser example</title>
+    <style>
+      .results-table {
+        border: 1px solid gray;
+      }
+    </style>
+    <script>
+      let hunspellInstance;
+
+      window.onload = function () {
+        const configureHunspellInstance = async () => {
+          hunspellInstance = await HunLib.getHunspellInstance(
+            document.querySelector('#aff-url').value,
+            document.querySelector('#dict-url').value,
+          )
+        }
+
+        configureHunspellInstance()
+
+        document.querySelector('#aff-url').addEventListener('change', event => {
+          configureHunspellInstance()
+        })
+
+        document.querySelector('#dict-url').addEventListener('change', event => {
+          configureHunspellInstance()
+        })
+
+        document.querySelector('#submit-btn').addEventListener('click', event => {
+          runSpellCheck()
+        });
+
+        document.querySelector('#query-input').addEventListener('keydown', event => {
+          if (event.key === "Enter") {
+            runSpellCheck()
+          }
+        });
+
+        const runSpellCheck = () => {
+          const query = document.querySelector('#query-input').value
+
+          if (!query) return
+
+          const result = HunLib.run(hunspellInstance, query)
+          console.log('query:', query, result)
+          addResultRow(
+            query,
+            result.spellDuration,
+            result.suggestDuration,
+            result.isSpelledCorrectly,
+            result.suggestions.join(', ')
+          )
+        }
+
+        const addCell = (rowRef, contents) => {
+          const text = document.createTextNode(contents)
+          const cell = rowRef.insertCell(-1)
+          cell.appendChild(text)
+        } 
+
+        const addResultRow = (query, spellDuration, suggestDuration, isSpelledCorrectly, suggestions) => {
+          let tableRef = document.getElementById('results-body');
+
+          // Insert a row at the front of the table
+          let row = tableRef.insertRow(-1);
+          addCell(row, query)
+          addCell(row, spellDuration)
+          addCell(row, suggestDuration)
+          addCell(row, isSpelledCorrectly)
+          addCell(row, suggestions)
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <h1>Wasm Hunspell Demo</h1>
+    AFF file: <input id="aff-url" style="width: 600px;" value="https://raw.githubusercontent.com/ropensci/hunspell/master/inst/dict/en_US.aff">
+    <br>
+    <br>
+    DICT file: <input id="dict-url" style="width: 600px;" value="https://raw.githubusercontent.com/ropensci/hunspell/master/inst/dict/en_US.dic">
+    <br>
+    <br>
+
+    <input id="query-input" style="width: 300px;">
+    <button id="submit-btn" >Spellcheck & Suggest</button>
+
+    <br>
+    <br>
+
+    <table id="results-table">
+      <thead>
+        <th style="width: 300px;" >Query</th>
+        <th style="width: 300px;" >Spellcheck duration (ms)</th>
+        <th style="width: 300px;" >Suggest duration (ms)</th>
+        <th style="width: 300px;" >Is Spelled Correctly?</th>
+        <th style="width: 300px;" >Suggestions found</th>
+      </thead>
+      <tbody id="results-body">
+      </tbody>
+    </table>
+
+  </body>
+</html>
