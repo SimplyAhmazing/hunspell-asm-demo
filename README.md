@@ -1,5 +1,3 @@
 ## Bundle hunspell-asm in frontend javascript
 
-This example aims for particular configuration to include wasm binary itself into frontend javascript bundles.
-In normal cases, it is more recommended to use remote location of wasm binary instead.
-Check comments in webpack.config.js for required configurations.
+This is modification of the [browser demo](https://github.com/kwonoj/hunspell-asm/tree/e0e421fda667fb0d4888a4e0b21877e95540c29c/examples/browser) by [kwonoj](https://github.com/kwonoj)
